@@ -1,5 +1,7 @@
 package com.saiTurf.API.controller;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,36 +39,43 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+    	Map<String, String> data = new HashMap();
         System.out.println("Received email: " + request.getEmail());
         System.out.println("Received password: " + request.getPassword());
         
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
-        System.out.println(encoder.encode("password123"));
+//        PasswordEncoder encoder = new BCryptPasswordEncoder();
+//        System.out.println(encoder.encode("password123"));
 
         Optional<UserModel> userOpt = userService.findByEmail(request.getEmail());
         
         if (userOpt.isEmpty()) {
-            System.out.println("❌ User not found!");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+//            System.out.println("❌ User not found!");
+        	data.put("MSG","User not found");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(data);
         }
 
         UserModel user = userOpt.get();
         
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             System.out.println("❌ Password mismatch!");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            data.put("MSG","Invalid Password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(data);
         }
 
 //        System.out.println("✅ User authenticated!");
 //        return ResponseEntity.ok("Login successful");
         String token = jwtService.generateToken(user);
-        return ResponseEntity.ok(token);
+        data.put("AccessToken", token);
+        return ResponseEntity.ok(data);
     }
     
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AuthRequest request) {
+    	Map<String, String> data = new HashMap();
         if (userService.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists");
+        	data.put("MSG","Email Already Exists");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(data);
         }
 
         UserModel user = new UserModel();
@@ -76,8 +85,8 @@ public class AuthController {
         user.setRole(request.getRole()); // Assuming role is passed as "USER" or "ADMIN"
 
         userService.registerUser(user.getName(), user.getEmail(), request.getPassword(), request.getRole());
-
-        return ResponseEntity.ok("User registered successfully");
+        data.put("MSG","User registered successfully");
+        return ResponseEntity.ok(data);
     }
 
 }
