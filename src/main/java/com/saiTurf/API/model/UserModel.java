@@ -20,7 +20,7 @@ public class UserModel implements UserDetails {
     private Long id;
 
     @Column(nullable = false, length = 100)
-    private String name;
+    private String username;
 
     @Column(unique = true, nullable = false, length = 150)
     private String email;
@@ -29,8 +29,8 @@ public class UserModel implements UserDetails {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10) // USER or ADMIN
-    private Role role;
+    @Column(nullable = false, length = 10)
+    private Role role = Role.USER; 
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -42,15 +42,16 @@ public class UserModel implements UserDetails {
     private LocalDateTime deletedAt;
 
     public UserModel() {
+    	 this.role = Role.USER; 
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
     public UserModel(String name, String email, String password, Role role) {
-        this.name = name;
+        this.username = name;
         this.email = email;
         this.password = password;
-        this.role = role;
+        this.role = (role != null) ? role : Role.USER;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -63,15 +64,15 @@ public class UserModel implements UserDetails {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
+//    public String getUsername() {
+//		return username;
+//	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setUserName(String userName) {
+		this.username = userName;
+	}
 
-    public String getEmail() {
+	public String getEmail() {
         return email;
     }
 
@@ -81,7 +82,7 @@ public class UserModel implements UserDetails {
 
     @Override
     public String getUsername() {  // Email is used as the username
-        return email;
+        return username;
     }
 
     @Override
@@ -98,7 +99,7 @@ public class UserModel implements UserDetails {
     }
 
     public void setRole(Role role) {
-        this.role = role;
+    	 this.role = (role != null) ? role : Role.USER;
     }
 
     public LocalDateTime getCreatedAt() {

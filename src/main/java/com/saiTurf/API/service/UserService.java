@@ -24,7 +24,7 @@ public class UserService {  // ❌ Removed `implements UserDetailsService`
         }
 
         UserModel user = new UserModel();
-        user.setName(name);
+        user.setUserName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));  
         user.setRole(role);
@@ -32,12 +32,12 @@ public class UserService {  // ❌ Removed `implements UserDetailsService`
         return userRepository.save(user);
     }
 
-    public Optional<UserModel> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public Optional<UserModel> findByUserName(String userName) {
+        return userRepository.findByUsername(userName);
     }
 
-    public boolean authenticateUser(String email, String rawPassword) {
-        Optional<UserModel> userOpt = userRepository.findByEmail(email);
+    public boolean authenticateUser(String userName, String rawPassword) {
+        Optional<UserModel> userOpt = userRepository.findByUsername(userName);
         return userOpt.map(user -> passwordEncoder.matches(rawPassword, user.getPassword())).orElse(false);
     }
 }
