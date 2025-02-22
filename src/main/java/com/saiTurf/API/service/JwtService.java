@@ -15,7 +15,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-	 private final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);   // Change this to a strong key!
+	 private final String SECRET_KEY = "aaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbDDDDDDDDDDDDDDDDDCCCCCFFFFF";   // Change this to a strong key!
 
     /**
      * ✅ Extract username (email) from token

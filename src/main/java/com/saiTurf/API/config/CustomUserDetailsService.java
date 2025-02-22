@@ -22,10 +22,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         UserModel user = userRepository.findByUsername(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userName));
+        		.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userName));
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                user.getUsername(),
                 user.getPassword(),
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())) // ✅ Modern approach
         );

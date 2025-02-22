@@ -1,5 +1,6 @@
 package com.saiTurf.API.controller;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +23,8 @@ import com.saiTurf.API.model.dto.AuthRequest;
 import com.saiTurf.API.service.JwtService;
 import com.saiTurf.API.service.UserService;
 
+import io.jsonwebtoken.security.Keys;
+
 
 @RestController
 @RequestMapping("/api")
@@ -29,7 +32,11 @@ public class AuthController {
 	@GetMapping("/test")
     public String test() {
 		System.out.println("testcalled");
-		return "api is started";
+		
+//		 String key = "iC3AXmvGAZLw3jcA9YBnsB80ay2h7ZlWDLrSqP4ZJGM=";
+//	        byte[] decodedKey = Base64.getDecoder().decode(key);
+//	        System.out.println(new String(decodedKey));
+        return "api is started";	
 	}
 	
 
@@ -88,9 +95,9 @@ public class AuthController {
     
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AuthRequest request) {
-    	Map<String, String> data = new HashMap();
+    	Map<String, Object> data = new HashMap();
         if (userService.findByUserName(request.getUsername()).isPresent()) {
-        	data.put("message","Email Already Exists");
+        	data.put("message","User Already Exists");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(data);
         }
 
@@ -102,9 +109,10 @@ public class AuthController {
         	user.setRole(Role.USER);
         else
         	user.setRole(request.getRole()); // Assuming role is passed as "USER" or "ADMIN"
-        userService.registerUser(user.getUsername(), user.getEmail(), request.getPassword(), request.getRole());
-        data.put("message","User registered successfully");
-        return ResponseEntity.ok(data);
+        user = userService.registerUser(user.getUsername(), user.getEmail(), request.getPassword(), request.getRole());
+        data.put("message",user.getUsername()+" registered successfully");
+        data.put("user",user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(data);
     }
 
 }

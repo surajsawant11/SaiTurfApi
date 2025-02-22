@@ -1,5 +1,6 @@
 package com.saiTurf.API.config;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,10 +39,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // ✅ Custom CORS Configuration
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) 
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                		.requestMatchers("/api/login/**", "/api/test/**", "/api/images/**", "/api/register").permitAll()
+                        .requestMatchers("/api/login", "/api/register", "/api/test/**", "/api/images/**").permitAll()  // ✅ No auth needed
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // ✅ Swagger
+                        .requestMatchers("/api/turfs/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -50,18 +53,28 @@ public class SecurityConfig {
                 .build();
     }
 
+
+
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200")); // 🔹 Allow Angular frontend
+        configuration.setAllowedOriginPatterns(List.of("*")); // ✅ Allow all
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true); // 🔥 Allow cookies & Authorization headers
+        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+
+
+
+
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
