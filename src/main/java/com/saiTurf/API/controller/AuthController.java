@@ -1,6 +1,5 @@
 package com.saiTurf.API.controller;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -17,13 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.saiTurf.API.dto.AuthRequest;
 import com.saiTurf.API.model.UserModel;
 import com.saiTurf.API.model.UserModel.Role;
-import com.saiTurf.API.model.dto.AuthRequest;
 import com.saiTurf.API.service.JwtService;
 import com.saiTurf.API.service.UserService;
-
-import io.jsonwebtoken.security.Keys;
 
 
 @RestController
@@ -94,7 +91,7 @@ public class AuthController {
     }
     
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody AuthRequest request) {
+    public ResponseEntity<?> register(@RequestBody UserModel request) {
     	Map<String, Object> data = new HashMap();
         if (userService.findByUserName(request.getUsername()).isPresent()) {
         	data.put("message","User Already Exists");

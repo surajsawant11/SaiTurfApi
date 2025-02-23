@@ -1,4 +1,4 @@
-package com.saiTurf.API.model.dto;
+package com.saiTurf.API.dto;
 
 //package com.yourcompany.yourproject.dto;
 
