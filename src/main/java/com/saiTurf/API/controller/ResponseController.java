@@ -1,7 +1,17 @@
 package com.saiTurf.API.controller;
 
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import javax.imageio.ImageIO;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -9,69 +19,90 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/api")
 public class ResponseController {
 
-    private static final String IMAGE_DIRECTORY = "C:/Users/Suraj/Desktop/turfImages/"; // ✅ Use forward slashes
+    private static final String IMAGE_DIRECTORY = "C:/Users/Suraj/Desktop/saiTurfImgFolder/"; // ✅ Use forward slashes
 
-    @GetMapping("/images/{imageName}")
-    public ResponseEntity<Resource> getImage(@PathVariable String imageName) {
-        System.out.println("Image request received: " + imageName);
-        
+    @GetMapping("/images/{imagesize}/{imageName}")
+    public ResponseEntity<byte[]> getImage(
+            @PathVariable int imagesize, // 🔹 Max width/height (e.g., 200, 300, 400)
+            @PathVariable String imageName) {
+
         try {
-            // Ensure case-insensitive search for JPG images
+            // 🔹 Find the image file (auto-detect extension)
             Path imagePath = findImagePath(imageName);
 
             if (imagePath == null || !Files.exists(imagePath) || !Files.isReadable(imagePath)) {
-                System.err.println("File not found or unreadable: " + imageName + " → Returning na.jpg");
-                imagePath = Paths.get(IMAGE_DIRECTORY).resolve("na.jpg"); // Fallback to default image
+                System.err.println("File not found: " + imageName + " → Returning na.jpg");
+                imagePath = Paths.get(IMAGE_DIRECTORY, "na.jpg"); // Fallback to default image
             }
 
-            Resource resource = new UrlResource(imagePath.toUri());
-            String contentType = Files.probeContentType(imagePath);
-            if (contentType == null) {
-                contentType = "application/octet-stream"; // Default content type
-            }
+            // 🔹 Read and resize the image (keep aspect ratio)
+            BufferedImage originalImage = ImageIO.read(imagePath.toFile());
+            BufferedImage resizedImage = resizeImageWithAspectRatio(originalImage, imagesize);
+
+            // 🔹 Convert BufferedImage to byte array
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(resizedImage, "jpg", baos); // Convert to JPEG format
+            byte[] imageBytes = baos.toByteArray();
 
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                    .body(resource);
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + imageName + ".jpg\"")
+                    .body(imageBytes);
 
-        } catch (Exception e) {
-            System.err.println("Error serving file: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Error processing image: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }
 
     /**
-     * Finds the image path, allowing for case-insensitive ".jpg" and ".JPG" extensions.
+     * Finds the image file without requiring the user to specify an extension.
      */
     private Path findImagePath(String imageName) {
-        Path exactPath = Paths.get(IMAGE_DIRECTORY).resolve(imageName).normalize();
-
-        if (Files.exists(exactPath) && Files.isReadable(exactPath)) {
-            return exactPath;
+        Path basePath = Paths.get(IMAGE_DIRECTORY);
+        
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(basePath, imageName + ".*")) {
+            for (Path entry : stream) {
+                return entry; // Return the first matched file
+            }
+        } catch (IOException e) {
+            System.err.println("Error searching for image: " + e.getMessage());
         }
-
-        // Try with lowercase ".jpg"
-        Path lowerJpg = Paths.get(IMAGE_DIRECTORY).resolve(imageName + ".jpg").normalize();
-        if (Files.exists(lowerJpg) && Files.isReadable(lowerJpg)) {
-            return lowerJpg;
-        }
-
-        // Try with uppercase ".JPG"
-        Path upperJpg = Paths.get(IMAGE_DIRECTORY).resolve(imageName + ".JPG").normalize();
-        if (Files.exists(upperJpg) && Files.isReadable(upperJpg)) {
-            return upperJpg;
-        }
-
-        return null; // If no match found
+        
+        return null; // No match found
     }
+
+    /**
+     * Resizes an image while keeping the original aspect ratio.
+     */
+    private BufferedImage resizeImageWithAspectRatio(BufferedImage originalImage, int maxSize) {
+        int originalWidth = originalImage.getWidth();
+        int originalHeight = originalImage.getHeight();
+
+        // 🔹 Calculate new dimensions while keeping aspect ratio
+        double aspectRatio = (double) originalWidth / originalHeight;
+        int newWidth, newHeight;
+
+        if (originalWidth > originalHeight) {
+            newWidth = maxSize;
+            newHeight = (int) (maxSize / aspectRatio);
+        } else {
+            newHeight = maxSize;
+            newWidth = (int) (maxSize * aspectRatio);
+        }
+
+        Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+        BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = resizedImage.createGraphics();
+        g2d.drawImage(scaledImage, 0, 0, null);
+        g2d.dispose();
+        return resizedImage;
+    }
+
 
     }
