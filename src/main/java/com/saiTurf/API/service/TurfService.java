@@ -1,13 +1,5 @@
 package com.saiTurf.API.service;
 
-import com.saiTurf.API.model.TurfDetailModel;
-import com.saiTurf.API.repository.TurfRepository;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +8,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.saiTurf.API.model.TurfDetailModel;
+import com.saiTurf.API.repository.TurfRepository;
+
 @Service
+@Transactional
 public class TurfService {
 	@Value("${image.upload.directory}")  // 🔹 Defined in `application.properties`
     private String uploadDirectory;

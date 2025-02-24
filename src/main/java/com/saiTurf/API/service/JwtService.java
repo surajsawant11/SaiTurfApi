@@ -7,12 +7,14 @@ import io.jsonwebtoken.security.Keys;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
 @Service
+@Transactional
 public class JwtService {
 
 	 private final String SECRET_KEY = "aaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbDDDDDDDDDDDDDDDDDCCCCCFFFFF";   // Change this to a strong key!

@@ -5,7 +5,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.saiTurf.API.dto.TurfDTO;
 import com.saiTurf.API.model.TurfDetailModel;
 import com.saiTurf.API.service.TurfService;
 
@@ -33,16 +36,25 @@ public class TurfController {
 
 	@Autowired
 	private final TurfService turfService;
+	
+	@Autowired
+	private ModelMapper modelMapper;
+
 
 	public TurfController(TurfService turfService) {
 		this.turfService = turfService;
 	}
 
-	@GetMapping()
-	public ResponseEntity<List<TurfDetailModel>> getAllTurfs() {
-		return ResponseEntity.ok(turfService.getAllTurfs()); // ✅ Return modified list
+	@GetMapping
+	public ResponseEntity<List<TurfDTO>> getAllTurfs() {
+	    List<TurfDetailModel> turfs = turfService.getAllTurfs();
+	    List<TurfDTO> turfDTOs = turfs.stream()
+                .map(turf -> modelMapper.map(turf, TurfDTO.class))
+                .toList();
 
+	    return ResponseEntity.ok(turfDTOs);
 	}
+
 
 	@PostMapping(value = "/save", consumes = "multipart/form-data")
 	public ResponseEntity<?> registerTurf(@RequestParam(value = "id", required = false) Long id, // Add ID for update
