@@ -20,17 +20,7 @@ public class UserService {  // ❌ Removed `implements UserDetailsService`
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserModel registerUser(String name, String email, String password, UserModel.Role role) {
-        if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email already exists");
-        }
-
-        UserModel user = new UserModel();
-        user.setUserName(name);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));  
-        user.setRole(role);
-
+    public UserModel save(UserModel user) {
         return userRepository.save(user);
     }
 

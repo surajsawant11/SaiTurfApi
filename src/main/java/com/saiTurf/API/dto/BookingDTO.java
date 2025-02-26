@@ -6,23 +6,22 @@ import java.time.LocalTime;
 
 public class BookingDTO {
     private Long id;
-    private Long userId;  // Only store user ID
-    private Long turfId;  // Only store turf ID
+    private UserDTO user;    // Full User Details
+    private TurfDTO turf;    // Full Turf Details
     private LocalDate bookingDate;
     private LocalTime startTime;
     private LocalTime endTime;
     private BigDecimal totalPrice;
-    private String status; // String to prevent enum serialization issues
+    private String status;
 
-    // ✅ No-arg constructor for ModelMapper
+    // Constructors
     public BookingDTO() {}
 
-    // ✅ Constructor (if needed)
-    public BookingDTO(Long id, Long userId, Long turfId, LocalDate bookingDate, 
+    public BookingDTO(Long id, UserDTO user, TurfDTO turf, LocalDate bookingDate, 
                       LocalTime startTime, LocalTime endTime, BigDecimal totalPrice, String status) {
         this.id = id;
-        this.userId = userId;
-        this.turfId = turfId;
+        this.user = user;
+        this.turf = turf;
         this.bookingDate = bookingDate;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -30,7 +29,7 @@ public class BookingDTO {
         this.status = status;
     }
 
-    // ✅ Getters and Setters
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -39,20 +38,20 @@ public class BookingDTO {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public UserDTO getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 
-    public Long getTurfId() {
-        return turfId;
+    public TurfDTO getTurf() {
+        return turf;
     }
 
-    public void setTurfId(Long turfId) {
-        this.turfId = turfId;
+    public void setTurf(TurfDTO turf) {
+        this.turf = turf;
     }
 
     public LocalDate getBookingDate() {

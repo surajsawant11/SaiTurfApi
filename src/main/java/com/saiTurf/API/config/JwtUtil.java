@@ -23,18 +23,25 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject); // Extracts "username"
     }
 
-    public String extractUserId(String token) {
-        return extractClaim(token, claims -> claims.get("userId", String.class)); // Extracts "userId"
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Long.class));
     }
+
+    
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class)); // Extracts "role"
+    }
+
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails, Long userId) {
+    public String generateToken(UserDetails userDetails, Long userId, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId); // Store userId in token
+        claims.put("role", role); // Store role in token
         return generateToken(claims, userDetails);
     }
 
