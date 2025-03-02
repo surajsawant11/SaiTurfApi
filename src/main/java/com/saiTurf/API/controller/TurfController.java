@@ -84,7 +84,7 @@ public class TurfController {
 			// ✅ Save Image (Only If Provided)
 			if (imageFile != null && !imageFile.isEmpty()) {
 				String imageUrl = turfService.saveImage(imageFile, savedTurf.getId());
-				savedTurf.setImageUrl(preFixImageUrl + "/500/" + imageUrl);
+				savedTurf.setImageUrl( "/images/turf/500/" + imageUrl);
 				savedTurf = turfService.registerTurf(savedTurf); // Update Turf with image URL
 			}
 

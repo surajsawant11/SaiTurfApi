@@ -7,18 +7,19 @@ import java.time.LocalTime;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "t_booking")
+@Table(name = "t_booking",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"turf_id", "bookingDate", "startTime", "endTime"}))
 public class BookingModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) 
     @JoinColumn(name = "user_id", nullable = false)
     private UserModel user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) 
     @JoinColumn(name = "turf_id", nullable = false)
     private TurfDetailModel turf;
 
@@ -48,8 +49,6 @@ public class BookingModel {
     private LocalDateTime cancelledAt;
 
     public BookingModel() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
         this.status = BookingStatus.PENDING;
     }
 
@@ -62,100 +61,110 @@ public class BookingModel {
         this.endTime = endTime;
         this.totalPrice = totalPrice;
         this.status = BookingStatus.PENDING;
+    }
+
+    @PrePersist
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    // Getters and Setters
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public Long getId() {
-        return id;
-    }
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public UserModel getUser() {
-        return user;
-    }
+	public UserModel getUser() {
+		return user;
+	}
 
-    public void setUser(UserModel user) {
-        this.user = user;
-    }
+	public void setUser(UserModel user) {
+		this.user = user;
+	}
 
-    public TurfDetailModel getTurf() {
-        return turf;
-    }
+	public TurfDetailModel getTurf() {
+		return turf;
+	}
 
-    public void setTurf(TurfDetailModel turf) {
-        this.turf = turf;
-    }
+	public void setTurf(TurfDetailModel turf) {
+		this.turf = turf;
+	}
 
-    public LocalDate getBookingDate() {
-        return bookingDate;
-    }
+	public LocalDate getBookingDate() {
+		return bookingDate;
+	}
 
-    public void setBookingDate(LocalDate bookingDate) {
-        this.bookingDate = bookingDate;
-    }
+	public void setBookingDate(LocalDate bookingDate) {
+		this.bookingDate = bookingDate;
+	}
 
-    public LocalTime getStartTime() {
-        return startTime;
-    }
+	public LocalTime getStartTime() {
+		return startTime;
+	}
 
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
+	public void setStartTime(LocalTime startTime) {
+		this.startTime = startTime;
+	}
 
-    public LocalTime getEndTime() {
-        return endTime;
-    }
+	public LocalTime getEndTime() {
+		return endTime;
+	}
 
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
+	public void setEndTime(LocalTime endTime) {
+		this.endTime = endTime;
+	}
 
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
+	public BigDecimal getTotalPrice() {
+		return totalPrice;
+	}
 
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
+	public void setTotalPrice(BigDecimal totalPrice) {
+		this.totalPrice = totalPrice;
+	}
 
-    public BookingStatus getStatus() {
-        return status;
-    }
+	public BookingStatus getStatus() {
+		return status;
+	}
 
-    public void setStatus(BookingStatus status) {
-        this.status = status;
-    }
+	public void setStatus(BookingStatus status) {
+		this.status = status;
+	}
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
 
-    public LocalDateTime getCancelledAt() {
-        return cancelledAt;
-    }
+	public LocalDateTime getCancelledAt() {
+		return cancelledAt;
+	}
 
-    public void setCancelledAt(LocalDateTime cancelledAt) {
-        this.cancelledAt = cancelledAt;
-    }
+	public void setCancelledAt(LocalDateTime cancelledAt) {
+		this.cancelledAt = cancelledAt;
+	}
 
-    // Enum for Booking Status
+
+
+	// Enum for Booking Status
     public enum BookingStatus {
         PENDING,
         CONFIRMED,

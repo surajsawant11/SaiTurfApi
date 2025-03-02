@@ -6,19 +6,26 @@ import java.time.LocalTime;
 
 public class BookingDTO {
     private Long id;
-    private UserDTO user;    // Full User Details
-    private TurfDTO turf;    // Full Turf Details
+    private UserDTO user;
+    private TurfDTO turf;
     private LocalDate bookingDate;
     private LocalTime startTime;
     private LocalTime endTime;
     private BigDecimal totalPrice;
-    private String status;
+    private Long turfId;
+    private Long userId;
+    private BookingStatus status;  // ✅ Change from String to Enum
+
+    // ✅ Add Enum for Booking Status
+    public enum BookingStatus {
+        PENDING, CONFIRMED, CANCELLED;
+    }
 
     // Constructors
     public BookingDTO() {}
 
     public BookingDTO(Long id, UserDTO user, TurfDTO turf, LocalDate bookingDate, 
-                      LocalTime startTime, LocalTime endTime, BigDecimal totalPrice, String status) {
+                      LocalTime startTime, LocalTime endTime, BigDecimal totalPrice, BookingStatus status) {
         this.id = id;
         this.user = user;
         this.turf = turf;
@@ -86,11 +93,28 @@ public class BookingDTO {
         this.totalPrice = totalPrice;
     }
 
-    public String getStatus() {
+    public BookingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(BookingStatus status) {
         this.status = status;
     }
+
+	public Long getTurfId() {
+		return turfId;
+	}
+
+	public void setTurfId(Long turfId) {
+		this.turfId = turfId;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+    
 }

@@ -37,13 +37,13 @@ public class TurfService {
     }
 
     public List<TurfDetailModel> getAllTurfs() {
-        return turfRepository.findAll();
+        return turfRepository.findAll(); // ✅ Ensure this fetches bookings too
     }
     
     public String saveImage(MultipartFile imageFile, Long turfId) throws IOException {
         String extension = StringUtils.getFilenameExtension(imageFile.getOriginalFilename());
         String fileName = "turf-"+turfId + (extension != null ? "." + extension : ""); // ID as filename
-        Path uploadPath = Paths.get(uploadDirectory);
+        Path uploadPath = Paths.get(uploadDirectory+"\\turf");
 
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath); // 🔹 Create directory if not exists
